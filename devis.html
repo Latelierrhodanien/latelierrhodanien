@@ -114,33 +114,26 @@
     var prods=[].slice.call(f.querySelectorAll('input[name=produit]:checked')).map(function(i){return i.value}).join(', ')||'À préciser';
     var d=v('f-date');if(d){var p=d.split('-');d=p[2]+'/'+p[1]+'/'+p[0]}
     var data={
-      'Nom':v('f-name'),
-      'Email':v('f-email'),
-      'Téléphone':v('f-tel')||'Non renseigné',
-      'Produits':prods,
-      'Événement':v('f-event'),
-      'Quantité':v('f-qty')||'À préciser',
-      "Date de l'événement":d||'À préciser',
-      'Remise':v('f-remise'),
-      'Projet':v('f-msg')||'—',
-      '_subject':'Nouvelle demande de devis · '+v('f-event')+' · '+v('f-name'),
-      '_replyto':v('f-email'),
-      '_template':'table',
-      '_captcha':'false'
+      nom:v('f-name'),
+      email:v('f-email'),
+      tel:v('f-tel'),
+      produits:prods==='À préciser'?'':prods,
+      evenement:v('f-event'),
+      quantite:v('f-qty'),
+      date:d||'',
+      remise:v('f-remise'),
+      projet:v('f-msg'),
+      _honey:v('f-honey')
     };
     btn.disabled=true;btn.textContent='Envoi en cours…';
-    fetch('https://formsubmit.co/ajax/latelierrhodanien@gmail.com',{
+    fetch('https://script.google.com/macros/s/AKfycbyszskRsP7MIIcusBeIL8M2hV9mOtY8MgizKrQio5iM0B6mCChp29HlsYsqgub4ZGUZ9w/exec',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Accept':'application/json'},
       body:JSON.stringify(data)
-    }).then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j}})})
-    .then(function(x){
-      if(x.ok&&String(x.j.success)==='true'){
+    }).then(function(r){return r.json()})
+    .then(function(j){
+      if(j&&j.success){
         [].slice.call(f.children).forEach(function(c){if(c!==res)c.hidden=true});
         res.hidden=false;res.scrollIntoView({behavior:'smooth',block:'nearest'});
-      }else if(/activat/i.test(String(x.j.message||''))){
-        btn.disabled=false;btn.textContent='Envoyer ma demande';
-        fail("Le formulaire n'est pas encore activé : un email d'activation de FormSubmit vient d'être envoyé à latelierrhodanien@gmail.com. Cliquez sur « Activate Form », puis renvoyez la demande.");
       }else{throw new Error()}
     }).catch(function(){
       btn.disabled=false;btn.textContent='Envoyer ma demande';
