@@ -105,11 +105,13 @@
   var f=document.getElementById('quote'),res=document.getElementById('result'),err=document.getElementById('f-err'),btn=document.getElementById('f-send');
   var v=function(id){return document.getElementById(id).value.trim()};
   var fail=function(m){err.textContent=m;err.hidden=false};
+  var debut=Date.now();
   var now=new Date(),pad=function(n){return (n<10?'0':'')+n};
   var today=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
   document.getElementById('f-date').min=today;
   f.addEventListener('submit',function(e){
     e.preventDefault();
+    var duree=Date.now()-debut;
     if(v('f-honey'))return;
     if(!v('f-name')||!v('f-email')){fail('Indiquez votre nom et votre email pour que je puisse vous répondre.');return}
     if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v('f-email'))){fail('Cette adresse email semble incomplète. Vérifiez-la.');return}
@@ -127,8 +129,13 @@
       date:d||'',
       remise:v('f-remise'),
       projet:v('f-msg'),
-      _honey:v('f-honey')
+      _honey:v('f-honey'),
+      _duree:duree
     };
+    if(duree<4000){
+      [].slice.call(f.children).forEach(function(c){if(c!==res)c.hidden=true});
+      res.hidden=false;return;
+    }
     btn.disabled=true;btn.textContent='Envoi en cours…';
     fetch('https://script.google.com/macros/s/AKfycbyszskRsP7MIIcusBeIL8M2hV9mOtY8MgizKrQio5iM0B6mCChp29HlsYsqgub4ZGUZ9w/exec',{
       method:'POST',
